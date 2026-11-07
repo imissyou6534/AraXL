@@ -1,0 +1,48 @@
+schema_version: 1
+source:
+  url: https://github.com/pulp-platform/AraXL.git
+  revision: a7f68c0b5a06a2583f46f6218042565cd5e7bab7
+adaptations:
+- CVA6 v2 public native accelerator ABI
+- Parameterized CVA6 v2 first-pass decoder
+- FPnew six-format/five-group configuration
+- Self-contained divider configuration
+files_sha256:
+  hardware/include/rvv_pkg.sv: e3016a695038c12902c86f826d26633349db8ee68ed6e84ad326142c29c54eb2
+  hardware/include/ara_pkg.sv: c6ea638a6176d638038b056a0385a8d34e325c1a89a5dca9b28b1be1029018d9
+  hardware/src/cva6_cut.sv: ea2edf6f398dbaa670b3c56b9008b4313e0ef944049ec04af7ccac2d9e838e66
+  hardware/src/req_fork_cut.sv: 0686ea7bf46a52b91a89dab5f3769f3fc963b30525849f01ba94079625497f85
+  hardware/src/ara_dispatcher.sv: f78bae63e897a5162a46ad3cf1637917bad90ff52d2d76f84b0f6d910de8ab1b
+  hardware/src/ara_sequencer.sv: 46dfe636ca20f8bf920b2404e547f1dcf5d96e0517eb91261683aba3a3b984fa
+  hardware/src/axi_inval_filter.sv: d6d363337d009140c4048ac28044a906b60cb8e17fd9be5bcdc6fc9ebde0282f
+  hardware/src/lane/lane_sequencer.sv: 27a9d6578c47f15f5ddb0b7358e82a3df2c8bea0b4a2a0e3702b844d182dc7ef
+  hardware/src/lane/operand_queue.sv: f56c1ef1fc418ee2b3874cdc202e8d9cf49a2a097a97cfe96b8e1914e9d3d5ee
+  hardware/src/lane/operand_requester.sv: f3337e2406da0571eb6dd9776664032dc447ea90ee85f2ad53ceca467eeb97e5
+  hardware/src/lane/simd_alu.sv: 7da739e1f3d5f055cb8d3d19bc2dbd4ada565951eac4cea539fff34ba13cc9d1
+  hardware/src/lane/simd_div.sv: cb2a22df3a7ab136d55cc2be92d2240afc32897b8099a610fa350574ea3ab893
+  hardware/src/lane/simd_mul.sv: 66e521a5deb0a5cf78af5c29c357be7118db26fe78a596df4369f5a36c4c1780
+  hardware/src/lane/vector_regfile.sv: 0b878f01a00ad0bcbc8ab4f9056a51ed0e0c8683d88cc65837d4b3528ee0acc6
+  hardware/src/lane/power_gating_generic.sv: 43098385fdc2e49066dc83d468302c962bfe37359f064a6185d9a43c7a0b9f0d
+  hardware/src/lane/power_gating_tech.sv: 64e9530de30f7919dd9a9272f79533b153317f6f8a08d399e91f570507415c36
+  hardware/src/masku/masku.sv: 8ee485fca590d376a45934ec65adb8906d57a5460ec0656b19efae4d428909b0
+  hardware/src/sldu/p2_stride_gen.sv: 4fa5c531b232bb9b52e73d2eb374886cf2566e9b1c7b7462740bf875bcb6654e
+  hardware/src/sldu/ring_router.sv: 9ce14e0f0d33a7a619cc4b4cb26052494b045f358f97eb065fc704b0689738f5
+  hardware/src/sldu/sldu_op_dp.sv: 558867fbf6d13e34432dcec28ac1b01c07bc877fb8a41a1ac6f8299c0384a4db
+  hardware/src/sldu/sldu.sv: a5c64d04e8c3117f5ce14f6b0160c0d85dda22770b31534a8eed432eb376dbd7
+  hardware/src/vlsu/addrgen.sv: d6f526460bba31ccdc80b4eb220f8e5abd5a673038f4a5fb3f16301e79523b42
+  hardware/src/vlsu/vldu.sv: 1cc0d551263afc5864ffba3934a74ee2226aba83e96bfb8068eb9aed44b26926
+  hardware/src/vlsu/vstu.sv: e908c314c6d86b7feff588b3f4162808c93ce28ff00787af5173dcd00a10fc6b
+  hardware/src/vlsu/global_ldst.sv: 1a3af391e091b92a57504200b65e1e05f92ad431579dda01070bd4e7a673b76a
+  hardware/src/vlsu/align_stage.sv: f2428198bc487440eba73abdb12721dfaa32bfae6333ad26f618c841502e543b
+  hardware/src/vlsu/shuffle_stage.sv: 5f75d95fb76e99aaa140898f1a6aa1214eca1a84b3ec8c82e8aefbd824dbc4ac
+  hardware/src/lane/operand_queues_stage.sv: 6aeae305d1d85affdf1597456f12c19c65cc5145054dcde85ce85305742d78c5
+  hardware/src/lane/valu.sv: acff4692a6396c84ee1665610f27c37e2f33332c417fb2f98f6e28bf67bfe872
+  hardware/src/lane/vmfpu.sv: 372eccb848656a882e320aa164e0a8802b705b302b89b5cc49883e7d62fbfaf3
+  hardware/src/lane/fixed_p_rounding.sv: 1ca46ef1da0a3c74f74f264b4433aff5e5c290f91d73475d7e758c1e440093fc
+  hardware/src/vlsu/vlsu.sv: 03f1457d41f99c9bc08138b66ce7be8eb96de01e07ba78897225f7af415b4d63
+  hardware/src/lane/vector_fus_stage.sv: 6716570fa0a042e55315d982bf3ea333a42b26b5297937e39193370ba4431f21
+  hardware/src/lane/lane.sv: feefc60e658f947743ab70678b77edd2bf72c324bb4348f0f30f2d48285102e3
+  hardware/src/ara.sv: 9f28bc6ed2abdb55e29a32f0708335e0eb758a517ad8283edf68168a74806457
+  hardware/src/ara_macro.sv: ed8c5347528da5480e0d639355d222bfdc8dbdd6aee659768188db09b5cc3909
+  hardware/src/ara_cluster.sv: f0a7d5254c9af8239c4a4a84f7f97f309fe8be4161d75c0a53fcc34544baeba2
+  hardware/src/cva6_accel_first_pass_decoder.sv: 3491e7208e81c293aa17dee61ac1bc6a8e5d8ea383c151ca9611953cf9d3df29

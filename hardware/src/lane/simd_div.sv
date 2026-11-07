@@ -308,6 +308,7 @@ module simd_div import ara_pkg::*; import rvv_pkg::*; #(
 
   // Serial divider
   serdiv #(
+    .CVA6Cfg(araxl_compat_pkg::DividerCfg),
     .WIDTH           (ELEN),
     .STABLE_HANDSHAKE(1   )
   ) i_serdiv (

@@ -534,15 +534,15 @@ module ara import ara_pkg::*; import rvv_pkg::*; #(
   if (ara_pkg::VLEN != 2**$clog2(ara_pkg::VLEN))
     $error("[ara] The vector length must be a power of two.");
 
-  if (RVVD(FPUSupport) && !ariane_pkg::RVD)
+  if (RVVD(FPUSupport) && !acc_pkg::RVD)
     $error(
       "[ara] Cannot support double-precision floating-point on Ara if Ariane does not support it.");
 
-  if (RVVF(FPUSupport) && !ariane_pkg::RVF)
+  if (RVVF(FPUSupport) && !acc_pkg::RVF)
     $error(
       "[ara] Cannot support single-precision floating-point on Ara if Ariane does not support it.");
 
-  if (RVVH(FPUSupport) && !ariane_pkg::XF16)
+  if (RVVH(FPUSupport) && !acc_pkg::XF16)
     $error(
       "[ara] Cannot support half-precision floating-point on Ara if Ariane does not support it.");
 

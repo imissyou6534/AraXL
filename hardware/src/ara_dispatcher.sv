@@ -70,13 +70,13 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
   `FF(vxsat_q, vxsat_d, '0)
   `FF(vxrm_q, vxrm_d, '0)
   // Converts between the internal representation of `vtype_t` and the full XLEN-bit CSR.
-  function automatic riscv::xlen_t xlen_vtype(vtype_t vtype);
+  function automatic acc_pkg::xlen_t xlen_vtype(vtype_t vtype);
     xlen_vtype = {vtype.vill, {riscv::XLEN-9{1'b0}}, vtype.vma, vtype.vta, vtype.vsew,
       vtype.vlmul[2:0]};
   endfunction: xlen_vtype
 
   // Converts between the XLEN-bit vtype CSR and its internal representation
-  function automatic vtype_t vtype_xlen(riscv::xlen_t xlen);
+  function automatic vtype_t vtype_xlen(acc_pkg::xlen_t xlen);
     vtype_xlen = '{
       vill  : xlen[riscv::XLEN-1],
       vma   : xlen[7],
@@ -465,11 +465,11 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
 
                 // Update vtype
                 if (insn.vsetvli_type.func1 == 1'b0) begin // vsetvli
-                  vtype_d = vtype_xlen(riscv::xlen_t'(insn.vsetvli_type.zimm11));
+                  vtype_d = vtype_xlen(acc_pkg::xlen_t'(insn.vsetvli_type.zimm11));
                 end else if (insn.vsetivli_type.func2 == 2'b11) begin // vsetivli
-                  vtype_d = vtype_xlen(riscv::xlen_t'(insn.vsetivli_type.zimm10));
+                  vtype_d = vtype_xlen(acc_pkg::xlen_t'(insn.vsetivli_type.zimm10));
                 end else if (insn.vsetvl_type.func7 == 7'b100_0000) begin // vsetvl
-                  vtype_d = vtype_xlen(riscv::xlen_t'(acc_req_i.rs2[7:0]));
+                  vtype_d = vtype_xlen(acc_pkg::xlen_t'(acc_req_i.rs2[7:0]));
                 end else
                   acc_resp_o.error = 1'b1;
 

@@ -1,290 +1,42 @@
-<h1 align="center">AraXL: A Physically Scalable, Ultra-Wide RISC-V Vector Processor Design for Fast and Efficient Computation on Long Vectors</h1>
-
-<a href="https://pulp-platform.org">
-<img src="docs/source/images/pulp_logo_icon.svg" alt="Logo" width="100" align="right">
-</a>
-
-The scaled up Ara version AraXL is a vector unit working as a coprocessor for the CVA6 core.
-It supports the RISC-V Vector Extension, [version 1.0](https://github.com/riscv/riscv-v-spec/releases/tag/v1.0).
-
-AraXL architecture consists of multiple Ara instances (Ara2 - https://github.com/pulp-platform/ara) and each Ara2 cluster is a lane based vector processor. 
-Multiple Ara2 clusters are interconnected with interfaces designed to access the L2 memory, other neighboring clusters and receive vector instructions from the CVA6 scalar core.
-
-AraXL is developed as part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/), a joint effort between ETH Zurich and the University of Bologna.
-
-## 📜 License
-Unless specified otherwise in the respective file headers, all code in this repository is released under permissive licenses.
-- Hardware sources and tool scripts are licensed under the [Solderpad Hardware License 0.51](LICENSE.hw) or compatible licenses.
-- All software sources are licensed under [Apache 2.0](LICENSE.sw). Modified or reuse of external contributions and the licenses are listed in the [apps/README.md](apps/README.md).
-
-## Dependencies
-
-Check `DEPENDENCIES.md` for a list of hardware and software dependencies of Ara.
-
-## Supported instructions
-
-Check `FUNCTIONALITIES.md` to check which instructions are currently support by Ara.
-
-## Get started
-
-Make sure you clone this repository recursively to get all the necessary submodules:
-
-```bash
-make git-submodules
-```
-
-If the repository path of any submodule changes, run the following command to change your submodule's pointer to the remote repository:
-
-```bash
-git submodule sync --recursive
-```
-
-## Toolchain
-
-### LLVM
-
-Ara requires a RISC-V LLVM toolchain capable of understanding the vector extension, version 1.0.
-
-To build this toolchain, run the following command in the project's root directory.
-
-```bash
-# Build the LLVM toolchain
-make toolchain-llvm
-```
-
-Ara also requires an updated Spike ISA simulator, with support for the vector extension.
-
-To build Spike, run the following command in the project's root directory.
-
-```bash
-# Build Spike
-make riscv-isa-sim
-```
-
-### Verilator
-
-Ara requires an updated version of Verilator, for RTL simulations.
-
-To build it, run the following command in the project's root directory.
-
-```bash
-# Build Verilator
-make verilator
-```
-
-## AraXL Configuration
-
-### Ara cluster
-
-The configuration of an Ara cluster can be done by specifying either the `config` command line variable. The default is `config=4_lanes` and heavily tested Ara cluster configuration.
-Prepend `config=chosen_ara_configuration` to your Makefile commands, or export the `ARA_CONFIGURATION` variable, to chose a configuration other than the `default` one.
-
-### AraXL
-
-The number of such 4-lane clusters can be configured by setting `nr_clusters` make variable. By default it is 2 resulting in a default configuration of 8-lane AraXL.
-
-*Note:* The `nr_lanes` is usually set to 4 by default and is not changed while `nr_clusters=2/4/8/16` can be set to scale the total number of lanes. To change the configuration set `nr_clusters` when compiling applications or hardware as shown in the below examples.
- 
-### 64-lane AraXL configuration
-
-To run the 64 lane configuration i.e. `nr_clusters=16` an additional patch to the AXI dependency is necessary to allow a 2048-bit AXI data width
-
-```bash
-cd hardware/deps/axi
-git apply ../../../patches/AraXL-64L.patch
-```
-
-## Software
-
-### Build Applications
-
-The `apps` folder contains example applications that work on Ara. Run the following command to build an application. E.g., `hello_world`:
-
-```bash
-cd apps
-make bin/hello_world
-```
-fmatmul example for 16 lane configuration
-```
-make bin/fmatmul nr_clusters=4 config=4_lanes
-```
-
-### SPIKE Simulation
-
-All the applications can be simulated with SPIKE. Run the following command to build and run an application. E.g., `hello_world`:
-
-```bash
-cd apps
-make bin/hello_world.spike
-make spike-run-hello_world
-```
-
-### RISC-V Tests
-To run the standardized [https://github.com/riscv-software-src/riscv-tests](https://github.com/riscv-software-src/riscv-tests) for AraXL, run
-```bash
-make riscv_unit_tests
-```
-This downloads the latest repository containing standardized riscv tests and build all the unit tests and the benchmarks.
-
-A patch is applied to update the `tohost` memory location to the memory mapped `EOC` register in AraXL used by the verilog test bench to return a pass/success status.
-
-The test binary can be run as usual from the `hardware/` folder
-```bash
-make sim preload=<path-to-the-risc-test-binary>
-```
-
-## RTL Simulation
-
-### Hardware dependencies
-
-The Ara repository depends on external IPs and uses Bender to handle the IP dependencies.
-To install Bender and initialize all the hardware IPs, run the following commands:
-
-```bash
-# Go to the hardware folder
-cd hardware
-# Install Bender and checkout all the IPs
-make checkout
-```
-
-### Patches (only once!)
-
-Note: this step is required only once, and needs to be repeated ONLY if the IP hardware dependencies are deleted and checked out again.
-
-Some of the IPs need to be patched to work with Verilator.
-
-```bash
-# Go to the hardware folder
-cd hardware
-# Apply the patches (only need to run this once)
-make apply-patches
-```
-
-### Simulation
-
-To simulate the Ara system with ModelSim, go to the `hardware` folder, which contains all the SystemVerilog files. Use the following command to run your simulation:
-
-```bash
-# Go to the hardware folder
-cd hardware
-# Only compile the hardware without running the simulation.
-make compile nr_clusters=4 config=4_lanes
-# Run the simulation with the *hello_world* binary loaded
-app=hello_world make sim
-# Run the simulation with the *some_binary* binary. This allows specifying the full path to the binary
-preload=/some_path/some_binary make sim
-# Run the simulation without starting the gui
-app=hello_world make simc
-```
-
-We also provide the `simv` makefile target to run simulations with the Verilator model.
-
-```bash
-# Go to the hardware folder
-cd hardware
-# Apply the patches (only need to run this once)
-make apply-patches
-# Only compile the hardware without running the simulation.
-make verilate
-# Run the simulation with the *hello_world* binary loaded
-app=hello_world make simv
-```
-
-It is also possible to simulate the unit tests compiled in the `apps` folder. Given the number of unit tests, we use Verilator. Use the following command to install Verilator, verilate the design, and run the simulation:
-
-```bash
-# Go to the hardware folder
-cd hardware
-# Apply the patches (only need to run this once)
-make apply-patches
-# Verilate the design
-make verilate
-# Run the tests
-make riscv_tests_simv
-```
-
-Alternatively, you can also use the `riscv_tests` target at Ara's top-level Makefile to both compile the RISC-V tests and run their simulation.
-
-### Traces
-
-Add `trace=1` to the `verilate`, `simv`, and `riscv_tests_simv` commands to generate waveform traces in the `fst` format.
-You can use `gtkwave` to open such waveforms.
-
-### Ideal Dispatcher mode
-
-CVA6 can be replaced by an ideal FIFO that dispatches the vector instructions to Ara with the maximum issue-rate possible.
-In this mode, only Ara and its memory system affect performance.
-This mode has some limitations:
- - The dispatcher is a simple FIFO. Ara and the dispatcher cannot have complex interactions.
- - Therefore, the vector program should be fire-and-forget. There cannot be runtime dependencies from the vector to the scalar code.
- - Not all the vector instructions are supported, e.g., the ones that use the `rs2` register.
-
-To compile a program and generate its vector trace:
-
-```bash
-cd apps
-make bin/${program}.ideal nr_clusters=4 config=4_lanes
-```
-
-This command will generate the `ideal` binary to be loaded in the L2 memory for the simulation (data accessed by the vector code).
-To run the system in Ideal Dispatcher mode:
-
-```bash
-cd hardware
-make sim app=${program} ideal_dispatcher=1 nr_clusters=4 config=4_lanes
-```
-
-### VCD Dumping
-
-It's possible to dump VCD files for accurate activity-based power analyses. To do so, use the `vcd_dump=1` option to compile the program and to run the simulation:
-
-```bash
-make -C apps bin/${program} vcd_dump=1
-make -C hardware simc app=${program} vcd_dump=1
-```
-
-Currently, the following kernels support automatic VCD dumping: `fmatmul`, `fconv3d`, `fft`, `dwt`, `exp`, `cos`, `log`, `dropout`, `jacobi2d`.
-
-### Linting Flow
-
-We also provide Synopsys Spyglass linting scripts in the hardware/spyglass. Run make lint in the hardware folder, with a specific MemPool configuration, to run the tests associated with the lint_rtl target.
-
-## Publications
-
-If you want to use AraXL, you can cite us:
-```
-@INPROCEEDINGS{10992880,
-  author={Purayil, Navaneeth Kunhi and Perotti, Matteo and Fischer, Tim and Benini, Luca},
-  booktitle={2025 Design, Automation & Test in Europe Conference (DATE)}, 
-  title={AraXL: A Physically Scalable, Ultra-Wide RISC-V Vector Processor Design for Fast and Efficient Computation on Long Vectors}, 
-  year={2025},
-  volume={},
-  number={},
-  pages={1-7},
-  keywords={Scalability;Computer architecture;Parallel processing;Vectors;Energy efficiency;Registers;Computational efficiency;Vector processors;Kernel;Optimization;Vector processors;RISC-V;Scalability},
-  doi={10.23919/DATE64628.2025.10992880}
-}
-```
-```
-@Article{Ara2020,
-  author = {Matheus Cavalcante and Fabian Schuiki and Florian Zaruba and Michael Schaffner and Luca Benini},
-  journal= {IEEE Transactions on Very Large Scale Integration (VLSI) Systems},
-  title  = {Ara: A 1-GHz+ Scalable and Energy-Efficient RISC-V Vector Processor With Multiprecision Floating-Point Support in 22-nm FD-SOI},
-  year   = {2020},
-  volume = {28},
-  number = {2},
-  pages  = {530-543},
-  doi    = {10.1109/TVLSI.2019.2950087}
-}
-```
-```
-@INPROCEEDINGS{9912071,
-  author={Perotti, Matteo and Cavalcante, Matheus and Wistoff, Nils and Andri, Renzo and Cavigelli, Lukas and Benini, Luca},
-  booktitle={2022 IEEE 33rd International Conference on Application-specific Systems, Architectures and Processors (ASAP)},
-  title={A “New Ara” for Vector Computing: An Open Source Highly Efficient RISC-V V 1.0 Vector Processor Design},
-  year={2022},
-  volume={},
-  number={},
-  pages={43-51},
-  doi={10.1109/ASAP54787.2022.00017}}
-```
+# AraXL Compute Library For CVA6 v2
+
+The `dsa-ara` branch exposes the hardware compute subset of upstream AraXL as a
+CVA6 v2-compatible Bender package. Source URL, base revision and original-file hashes are in UPSTREAM.yml.
+The original hardware license is preserved in LICENSE.hw and file headers.
+
+Consume https://github.com/imissyou6534/AraXL.git at a fixed commit and commit
+the consuming project's Bender.lock. This branch retains upstream history;
+UPSTREAM.yml is provenance, not the effective version of the adapted source.
+The package's own Bender.lock records the independently checked dependency set.
+
+## Boundary
+
+Select `araxl_compute` with `exclude_first_pass_decoder`. The package provides
+the real cluster/lane/VLSU RTL, a CVA6 v2 first-pass decoder and public native
+accelerator ABI. Legacy SoC, application and toolchain files remain for upstream
+history but are not selected by this manifest. The old standalone SoC build is
+not this branch's supported integration target. All selected processor RTL comes
+from the single dependency named cva6; no legacy ariane dependency is resolved.
+
+The consuming design also selects its CVA6 configuration and vector length. The
+standalone elaboration regression uses cva6, cv64a6_imafdchsclic_sv39_wb,
+araxl_compute, exclude_first_pass_decoder, VLEN=1024 and USE_CLUSTER. Run it
+from the Cheshire integration with `python3 -m unittest discover -s util/tests -p test_araxl_library.py -v`.
+
+The public acc_pkg ABI is RV64 with three transaction ID bits. The current
+validated floating-point profile is single/double precision without half
+precision. Integrations must validate their CPU/ABI widths against these types.
+There are no dependencies on Cheshire VCU packages or a particular memory map.
+
+## Compatibility History
+
+- `ara_dispatcher`: use the library's public XLEN type.
+- `ara`: use explicit scalar floating-point capability constants.
+- `simd_div`: pass a local nonzero-ID divider configuration to CVA6 v2 serdiv.
+- `vmfpu`: explicitly map FPnew's six formats and five operation groups and
+  provide the new hart-id input.
+- Decoder: use CVA6 v2 configuration and parameterized scoreboard types.
+
+These changes are normal source files. Builds do not rewrite them or generate
+adapted copies. Host CPU settings, native-interface adaptation, private memory,
+FIFO, Debug Module and shared-memory policy belong to the parent integration.

@@ -767,22 +767,26 @@ module vmfpu import ara_pkg::*; import rvv_pkg::*; import fpnew_pkg::*;
       Width        : 64,
       EnableVectors: 1'b1,
       EnableNanBox : 1'b1,
-      FpFmtMask    : {RVVF(FPUSupport), RVVD(FPUSupport), RVVH(FPUSupport), 1'b0, 1'b0},
+      FpFmtMask    : {RVVF(FPUSupport), RVVD(FPUSupport), RVVH(FPUSupport), 1'b0, 1'b0, 1'b0},
       IntFmtMask   : {1'b0, 1'b1, 1'b1, 1'b1}
     };
 
     // Implementation (number of registers etc)
     localparam fpu_implementation_t FPUImplementation = '{
       PipeRegs: '{
-        '{LatFCompEW32, LatFCompEW64, LatFCompEW16, LatFCompEW8, LatFCompEW16Alt},
-        '{default: LatFDivSqrt},
-        '{default: LatFNonComp},
-        '{default: LatFConv}},
+        ADDMUL: '{FP32: LatFCompEW32, FP64: LatFCompEW64,
+                  FP16: LatFCompEW16, FP8: LatFCompEW8,
+                  FP16ALT: LatFCompEW16Alt, default: 0},
+        DIVSQRT: '{default: LatFDivSqrt},
+        NONCOMP: '{default: LatFNonComp},
+        CONV: '{default: LatFConv},
+        default: '{default: 0}},
       UnitTypes: '{
-        '{default: PARALLEL}, // ADDMUL
-        '{default: MERGED},   // DIVSQRT
-        '{default: PARALLEL}, // NONCOMP
-        '{default: MERGED}}, // CONV
+        ADDMUL: '{default: PARALLEL},
+        DIVSQRT: '{default: MERGED},
+        NONCOMP: '{default: PARALLEL},
+        CONV: '{default: MERGED},
+        default: '{default: DISABLED}},
       PipeConfig: DISTRIBUTED
     };
 
@@ -992,6 +996,7 @@ module vmfpu import ara_pkg::*; import rvv_pkg::*; import fpnew_pkg::*;
       .TrueSIMDClass (TrueSIMDClass    ),
       .EnableSIMDMask(EnableSIMDMask   )
     ) i_fpnew_bulk (
+      .hart_id_i ('0),
       .clk_i         (clk_i          ),
       .rst_ni        (rst_ni         ),
       .flush_i       (1'b0           ),
