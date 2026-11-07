@@ -14,7 +14,10 @@ The package's own Bender.lock records the independently checked dependency set.
 Select `araxl_compute` with `exclude_first_pass_decoder`. The package provides
 the real cluster/lane/VLSU RTL, a CVA6 v2 first-pass decoder and public native
 accelerator ABI. Legacy SoC, application and toolchain files remain for upstream
-history but are not selected by this manifest. The old standalone SoC build is
+history but are not selected by this manifest. Legacy toolchain/benchmark Git
+submodules are removed so Bender does not recursively download compilers and
+simulators when checking out this compute dependency. Use installed project
+tools. The old standalone SoC build is
 not this branch's supported integration target. All selected processor RTL comes
 from the single dependency named cva6; no legacy ariane dependency is resolved.
 
